@@ -30,7 +30,7 @@ class HomeViewController: UIViewController {
         let headerView = HeroHeaderView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
         homeFeedTable.tableHeaderView = headerView
         
-        getTrendingMovies()
+        fetchData()
     }
     
     private func configureNavBar() {
@@ -51,7 +51,8 @@ class HomeViewController: UIViewController {
         homeFeedTable.frame = view.bounds
     }
     
-    private func getTrendingMovies() {
+    private func fetchData() {
+        /*
         APICaller.shared.getTrendingMovies { results in
             switch results {
             case .success(let movies):
@@ -59,6 +60,23 @@ class HomeViewController: UIViewController {
             case .failure(let error):
                 print(error)
             }
+        }
+        
+        APICaller.shared.getTrendingTvs { results in
+            
+            
+        }
+        
+        APICaller.shared.getUpcomingMovies { result in
+            
+        }
+        
+        APICaller.shared.getPopularMovies { result in
+            
+        } */
+        
+        APICaller.shared.getTopRatedMovies { result in
+            
         }
     }
 }
@@ -99,6 +117,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         header.textLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
         header.textLabel?.frame = CGRect(x: header.bounds.origin.x + 20, y: header.bounds.origin.y, width: 100, height: header.bounds.height)
         header.textLabel?.textColor = .white
+        header.textLabel?.text = header.textLabel?.text?.capitalizeFirstLetter()
     }
     
     // table views inherits all the methods that scroll view have

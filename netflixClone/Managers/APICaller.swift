@@ -18,7 +18,7 @@ struct Constants {
     static let popularURL = "/3/movie/popular?api_key="
     static let topRatedURL = "/3/movie/top_rated?api_key="
     static let getDiscoveredMovie = "/3/discover/movie?api_key="
-    
+    static let search = "/3/search/movie?api_key="
 }
 
 enum APIError: Error {
@@ -124,6 +124,28 @@ class APICaller {
     
     func getDiscoverMovies(completion: @escaping (Result<[Title], Error>) -> Void) {
         guard let url = URL(string: "\(Constants.baseURL + Constants.getDiscoveredMovie + Constants.apiKey + Constants.languageURLV2)sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_watch_monetization_types=flatrate") else { return }
+        
+        let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do {
+                let results = try JSONDecoder().decode(TrendingTitleResponse.self, from: data)
+                completion(.success(results.results))
+            } catch {
+                completion(.failure(APIError.failed))
+            }
+        }
+        task.resume()
+    }
+    
+    
+    func search(with query: String, completion: @escaping (Result<[Title], Error>) -> Void) {
+        
+        guard let query = query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else { return }
+        
+        guard let url = URL(string: "\(Constants.baseURL + Constants.search + Constants.apiKey)&query=\(query)") else { return }
         
         let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, _, error in
             guard let data = data, error == nil else {

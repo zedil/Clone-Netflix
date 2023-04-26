@@ -9,13 +9,15 @@ import Foundation
 
 struct Constants {
     static let apiKey = "cb302cf2fa7bf2f641c72d4683998f42"
+    static let languageURL = "&language=en-US&page=1"
+    static let languageURLV2 = "&language=en-US&"
     static let baseURL = "https://api.themoviedb.org"
     static let trendingURL = "/3/trending/movie/day?api_key="
     static let tvURL = "/3/trending/tv/day?api_key="
     static let upcomingURL = "/3/movie/upcoming?api_key="
-    static let languageURL = "&language=en-US&page=1"
     static let popularURL = "/3/movie/popular?api_key="
     static let topRatedURL = "/3/movie/top_rated?api_key="
+    static let getDiscoveredMovie = "/3/discover/movie?api_key="
     
 }
 
@@ -104,6 +106,24 @@ class APICaller {
     
     func getTopRatedMovies(completion: @escaping (Result<[Title], Error>) -> Void) {
         guard let url = URL(string: "\(Constants.baseURL + Constants.topRatedURL + Constants.apiKey + Constants.languageURL)") else { return }
+        
+        let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, _, error in
+            guard let data = data, error == nil else {
+                return
+            }
+            
+            do {
+                let results = try JSONDecoder().decode(TrendingTitleResponse.self, from: data)
+                completion(.success(results.results))
+            } catch {
+                completion(.failure(APIError.failed))
+            }
+        }
+        task.resume()
+    }
+    
+    func getDiscoverMovies(completion: @escaping (Result<[Title], Error>) -> Void) {
+        guard let url = URL(string: "\(Constants.baseURL + Constants.getDiscoveredMovie + Constants.apiKey + Constants.languageURLV2)sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_watch_monetization_types=flatrate") else { return }
         
         let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, _, error in
             guard let data = data, error == nil else {
